@@ -1,0 +1,24 @@
+name: Deploy Pre-Built React App to EC2
+
+on:
+  push:
+    branches:
+      - main
+
+jobs:
+  deploy:
+    name: Deploy Build to EC2
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Deploy to EC2 via SSH
+        uses: appleboy/ssh-action@v0.1.6
+        with:
+          host: ${{ secrets.EC2_HOST }}
+          username: ${{ secrets.EC2_USER }}
+          key: ${{ secrets.EC2_SSH_KEY }}
+          script: |
+            rm -rf scp-resume-app-frontend
+            git clone https://github.com/Abhijoshy/scp-resume-app-frontend.git
+            sudo cp -r scp-resume-app-frontend/* /usr/share/nginx/html/
+            sudo systemctl restart nginx
